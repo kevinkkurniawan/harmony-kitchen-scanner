@@ -29,7 +29,6 @@ interface Product {
 export default function Home() {
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showAllGrosir, setShowAllGrosir] = useState(true);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +41,7 @@ export default function Home() {
       // Escape clears input
       if (e.key === 'Escape') {
         setQuery('');
-        setSelectedProduct(null);
+        setProducts([]);
         searchInputRef.current?.focus();
         return;
       }
@@ -67,7 +66,6 @@ export default function Home() {
     const trimmed = searchQuery.trim();
     if (!trimmed) {
       setProducts([]);
-      setSelectedProduct(null);
       setIsLoading(false);
       return;
     }
@@ -78,28 +76,12 @@ export default function Home() {
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setProducts(json.data);
-        if (json.data.length === 1) {
-          setSelectedProduct(json.data[0]);
-        } else if (json.data.length > 1) {
-          // If previous selection is still in list, keep it; otherwise select first
-          setSelectedProduct((prev) => {
-            if (prev) {
-              const match = json.data.find((p: Product) => p.id === prev.id);
-              if (match) return match;
-            }
-            return json.data[0];
-          });
-        } else {
-          setSelectedProduct(null);
-        }
       } else {
         setProducts([]);
-        setSelectedProduct(null);
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setProducts([]);
-      setSelectedProduct(null);
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +106,6 @@ export default function Home() {
   const handleClear = () => {
     setQuery('');
     setProducts([]);
-    setSelectedProduct(null);
     searchInputRef.current?.focus();
   };
 
@@ -160,8 +141,6 @@ export default function Home() {
       </span>
     );
   };
-
-  const activeProduct = selectedProduct || (products.length > 0 ? products[0] : null);
 
   return (
     <div className="container">
@@ -240,202 +219,120 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* State 1: Active Product Spotlight Hero Card */}
-        {activeProduct && (
-          <div className="spotlight-card">
-            <div className="spotlight-header">
-              <div className="spotlight-title-area">
-                <span className="spotlight-badge">Produk Terpilih</span>
-                <h2 className="spotlight-title">{activeProduct.inventoryName}</h2>
-                <div className="spotlight-meta">
-                  <div className="meta-badge barcode">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                      <path d="M6 8v8M10 8v8M14 8v8M18 8v8"></path>
-                    </svg>
-                    <span>Barcode: <strong>{activeProduct.barcode}</strong></span>
-                  </div>
-                  {activeProduct.inventoryNo && activeProduct.inventoryNo !== activeProduct.barcode && (
-                    <div className="meta-badge">
-                      <span>Kode: <strong>{activeProduct.inventoryNo}</strong></span>
-                    </div>
-                  )}
-                  <div className="meta-badge">
-                    <span>Satuan: <strong>{activeProduct.uom}</strong></span>
-                  </div>
-                  {activeProduct.wholesaleCategory?.name && (
-                    <div className="meta-badge wholesale">
-                      <span>Kategori Grosir: <strong>{activeProduct.wholesaleCategory.name}</strong></span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Stock Badge */}
-              <div className={`stock-hero-badge ${activeProduct.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                <div className="stock-hero-label">STOK TERSEDIA</div>
-                <div className="stock-hero-value">
-                  {formatNumber(activeProduct.stock)} <span className="stock-unit">{activeProduct.uom}</span>
-                </div>
-                <div className="stock-hero-status">
-                  {activeProduct.stock > 0 ? '● Siap Dijual' : '● Stok Kosong'}
-                </div>
-              </div>
-            </div>
-
-            {/* Price Grid */}
-            <div className="pricing-container">
-              {/* Retail / Eceran Price */}
-              <div className="price-card retail">
-                <div className="price-tag">HARGA ECERAN / RETAIL</div>
-                <div className="price-amount">{formatCurrency(activeProduct.price)}</div>
-                <div className="price-sub">Harga per {activeProduct.uom}</div>
-              </div>
-
-              {/* Wholesale 1 */}
-              <div className="price-card wholesale tier-1">
-                <div className="price-tag">
-                  GROSIR 1
-                  {activeProduct.wholesaleCategory?.tier1_minqty ? (
-                    <span className="min-qty-badge">≥ {activeProduct.wholesaleCategory.tier1_minqty} {activeProduct.uom}</span>
-                  ) : null}
-                </div>
-                <div className="price-amount">
-                  {activeProduct.grosir1 > 0 ? formatCurrency(activeProduct.grosir1) : '-'}
-                </div>
-                <div className="price-sub">
-                  {activeProduct.grosir1 > 0 
-                    ? `Hemat ${formatCurrency(Math.max(0, activeProduct.price - activeProduct.grosir1))}`
-                    : 'Tidak tersedia'}
-                </div>
-              </div>
-
-              {/* Wholesale 2 */}
-              <div className="price-card wholesale tier-2">
-                <div className="price-tag">
-                  GROSIR 2
-                  {activeProduct.wholesaleCategory?.tier2_minqty ? (
-                    <span className="min-qty-badge">≥ {activeProduct.wholesaleCategory.tier2_minqty} {activeProduct.uom}</span>
-                  ) : null}
-                </div>
-                <div className="price-amount">
-                  {activeProduct.grosir2 > 0 ? formatCurrency(activeProduct.grosir2) : '-'}
-                </div>
-                <div className="price-sub">
-                  {activeProduct.grosir2 > 0 
-                    ? `Hemat ${formatCurrency(Math.max(0, activeProduct.price - activeProduct.grosir2))}`
-                    : 'Tidak tersedia'}
-                </div>
-              </div>
-
-              {/* Wholesale 3 */}
-              <div className="price-card wholesale tier-3">
-                <div className="price-tag">
-                  GROSIR 3
-                  {activeProduct.wholesaleCategory?.tier3_minqty ? (
-                    <span className="min-qty-badge">≥ {activeProduct.wholesaleCategory.tier3_minqty} {activeProduct.uom}</span>
-                  ) : null}
-                </div>
-                <div className="price-amount">
-                  {activeProduct.grosir3 > 0 ? formatCurrency(activeProduct.grosir3) : '-'}
-                </div>
-                <div className="price-sub">
-                  {activeProduct.grosir3 > 0 
-                    ? `Hemat ${formatCurrency(Math.max(0, activeProduct.price - activeProduct.grosir3))}`
-                    : 'Tidak tersedia'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* State 2: Multiple Products List / Table View */}
-        {products.length > 1 && (
+        {/* Table View - Displayed whenever products exist */}
+        {products.length > 0 && (
           <div className="table-wrapper">
             <div className="table-header-info">
               <h3 className="table-info-title">
                 Hasil Pencarian: <strong>{products.length} barang ditemukan</strong>
               </h3>
-              <span className="table-info-subtitle">Klik salah satu baris untuk melihat detail produk di atas</span>
             </div>
 
             <div className="table-container">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '18%' }}>Barcode / Kode</th>
-                    <th style={{ width: '32%' }}>Nama Barang</th>
-                    <th className="text-center" style={{ width: '10%' }}>Satuan</th>
-                    <th className="text-right" style={{ width: '12%' }}>Harga Eceran</th>
+                    <th style={{ width: '16%' }}>Barcode / Kode</th>
+                    <th style={{ width: '30%' }}>Nama Barang</th>
+                    <th className="text-center" style={{ width: '8%' }}>Satuan</th>
+                    <th className="text-right" style={{ width: '14%' }}>Harga Eceran</th>
                     <th className="text-right" style={{ width: '10%' }}>Stok</th>
                     {showAllGrosir ? (
                       <>
-                        <th className="text-right" style={{ width: '9%' }}>Grosir 1</th>
-                        <th className="text-right" style={{ width: '9%' }}>Grosir 2</th>
-                        <th className="text-right" style={{ width: '9%' }}>Grosir 3</th>
+                        <th className="text-right" style={{ width: '11%' }}>Grosir 1</th>
+                        <th className="text-right" style={{ width: '11%' }}>Grosir 2</th>
+                        <th className="text-right" style={{ width: '11%' }}>Grosir 3</th>
                       </>
                     ) : (
-                      <th className="text-right" style={{ width: '15%' }}>Grosir 3</th>
+                      <th className="text-right" style={{ width: '22%' }}>Harga Grosir</th>
                     )}
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => {
-                    const isSelected = activeProduct?.id === p.id;
-                    return (
-                      <tr 
-                        key={p.id} 
-                        className={`table-row ${isSelected ? 'row-selected' : ''}`}
-                        onClick={() => setSelectedProduct(p)}
-                      >
-                        <td className="font-mono">
-                          <div className="barcode-cell">
-                            {highlightText(p.barcode, query)}
+                  {products.map((p) => (
+                    <tr key={p.id} className="table-row">
+                      <td className="font-mono">
+                        <div className="barcode-cell">
+                          {highlightText(p.barcode, query)}
+                        </div>
+                      </td>
+                      <td className="product-name-cell">
+                        <div className="product-name-text">
+                          {highlightText(p.inventoryName, query)}
+                        </div>
+                        {p.wholesaleCategory?.name && (
+                          <div className="product-category-sub">
+                            Kategori: {p.wholesaleCategory.name}
                           </div>
-                        </td>
-                        <td className="product-name-cell">
-                          <span className="product-name-text">
-                            {highlightText(p.inventoryName, query)}
-                          </span>
-                        </td>
-                        <td className="text-center">
-                          <span className="uom-pill">{p.uom}</span>
-                        </td>
-                        <td className="text-right price-cell">
-                          {formatCurrency(p.price)}
-                        </td>
-                        <td className="text-right">
-                          <span className={`stock-pill ${p.stock > 0 ? 'stock-ok' : 'stock-empty'}`}>
-                            {formatNumber(p.stock)}
-                          </span>
-                        </td>
-                        {showAllGrosir ? (
-                          <>
-                            <td className="text-right grosir-cell">
-                              {p.grosir1 > 0 ? formatCurrency(p.grosir1) : '-'}
-                            </td>
-                            <td className="text-right grosir-cell">
-                              {p.grosir2 > 0 ? formatCurrency(p.grosir2) : '-'}
-                            </td>
-                            <td className="text-right grosir-cell font-semibold">
-                              {p.grosir3 > 0 ? formatCurrency(p.grosir3) : '-'}
-                            </td>
-                          </>
-                        ) : (
-                          <td className="text-right grosir-cell font-semibold">
-                            {p.grosir3 > 0 ? formatCurrency(p.grosir3) : '-'}
-                          </td>
                         )}
-                      </tr>
-                    );
-                  })}
+                      </td>
+                      <td className="text-center">
+                        <span className="uom-pill">{p.uom}</span>
+                      </td>
+                      <td className="text-right price-cell">
+                        {formatCurrency(p.price)}
+                      </td>
+                      <td className="text-right">
+                        <span className={`stock-pill ${p.stock > 0 ? 'stock-ok' : 'stock-empty'}`}>
+                          {formatNumber(p.stock)}
+                        </span>
+                      </td>
+                      {showAllGrosir ? (
+                        <>
+                          <td className="text-right grosir-cell">
+                            {p.grosir1 > 0 ? (
+                              <div>
+                                <span className="font-semibold">{formatCurrency(p.grosir1)}</span>
+                                {p.wholesaleCategory?.tier1_minqty ? (
+                                  <div className="tier-min-qty">≥ {p.wholesaleCategory.tier1_minqty} {p.uom}</div>
+                                ) : null}
+                              </div>
+                            ) : '-'}
+                          </td>
+                          <td className="text-right grosir-cell">
+                            {p.grosir2 > 0 ? (
+                              <div>
+                                <span className="font-semibold">{formatCurrency(p.grosir2)}</span>
+                                {p.wholesaleCategory?.tier2_minqty ? (
+                                  <div className="tier-min-qty">≥ {p.wholesaleCategory.tier2_minqty} {p.uom}</div>
+                                ) : null}
+                              </div>
+                            ) : '-'}
+                          </td>
+                          <td className="text-right grosir-cell font-semibold">
+                            {p.grosir3 > 0 ? (
+                              <div>
+                                <span className="text-emerald-700 font-bold">{formatCurrency(p.grosir3)}</span>
+                                {p.wholesaleCategory?.tier3_minqty ? (
+                                  <div className="tier-min-qty">≥ {p.wholesaleCategory.tier3_minqty} {p.uom}</div>
+                                ) : null}
+                              </div>
+                            ) : '-'}
+                          </td>
+                        </>
+                      ) : (
+                        <td className="text-right grosir-cell font-semibold">
+                          {p.grosir3 > 0 ? (
+                            <div>
+                              <span className="text-emerald-700 font-bold">{formatCurrency(p.grosir3)}</span>
+                              {p.wholesaleCategory?.tier3_minqty ? (
+                                <div className="tier-min-qty">≥ {p.wholesaleCategory.tier3_minqty} {p.uom}</div>
+                              ) : null}
+                            </div>
+                          ) : (
+                            p.grosir1 > 0 ? formatCurrency(p.grosir1) : '-'
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* State 3: Loading Skeleton */}
+        {/* Loading State */}
         {isLoading && (
           <div className="loading-card">
             <div className="loading-spinner"></div>
@@ -443,7 +340,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* State 4: Empty Initial Idle State */}
+        {/* Empty Initial Idle State */}
         {!query.trim() && !isLoading && (
           <div className="idle-state">
             <div className="scanner-animation">
@@ -464,7 +361,7 @@ export default function Home() {
             <div className="feature-cards">
               <div className="feature-card">
                 <div className="feature-icon">⚡</div>
-                <h4>Pemindaian Otomatis</h4>
+                <h4>Pemindaian Cepat</h4>
                 <p>Otomatis mencocokkan kode barcode fisik tanpa perlu menekan tombol pencarian.</p>
               </div>
               <div className="feature-card">
@@ -481,7 +378,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* State 5: No Results State */}
+        {/* No Results State */}
         {query.trim() && !isLoading && products.length === 0 && (
           <div className="no-results-card">
             <div className="no-results-icon">

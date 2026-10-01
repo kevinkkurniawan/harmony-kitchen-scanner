@@ -15,7 +15,7 @@
   --border-color: #cbd5e1;
   --border-light: #e2e8f0;
   --table-header-bg: #f1f5f9;
-  --table-row-hover: #f8fafc;
+  --table-row-hover: #f1f5f9;
   --table-row-zebra: #ffffff;
   --table-row-zebra-alt: #f8fafc;
   --highlight-bg: #fef08a;
@@ -267,240 +267,7 @@ body {
 }
 
 /* ==========================================================================
-   Spotlight Hero Card (When Product is Scanned / Highlighted)
-   ========================================================================== */
-.spotlight-card {
-  background-color: var(--surface);
-  border: 2px solid #bfdbfe;
-  border-radius: 1.25rem;
-  padding: 2rem 2.25rem;
-  box-shadow: var(--card-shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.spotlight-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #2563eb, #059669, #3b82f6);
-}
-
-.spotlight-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 2rem;
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 1.5rem;
-}
-
-.spotlight-title-area {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  flex: 1;
-}
-
-.spotlight-badge {
-  align-self: flex-start;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.25rem 0.65rem;
-  border-radius: 0.375rem;
-  background-color: #dbeafe;
-  color: #1d4ed8;
-}
-
-.spotlight-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.25;
-}
-
-.spotlight-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.meta-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  padding: 0.35rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-  color: #334155;
-}
-
-.meta-badge.barcode {
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
-  color: #1e40af;
-  font-family: var(--font-geist-mono), monospace;
-}
-
-.meta-badge.wholesale {
-  background-color: #fdf4ff;
-  border-color: #f0abfc;
-  color: #86198f;
-}
-
-/* Stock Hero Badge */
-.stock-hero-badge {
-  min-width: 220px;
-  border-radius: 1rem;
-  padding: 1.25rem 1.5rem;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border: 2px solid transparent;
-}
-
-.stock-hero-badge.in-stock {
-  background-color: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #065f46;
-}
-
-.stock-hero-badge.out-of-stock {
-  background-color: #fff1f2;
-  border-color: #fecdd3;
-  color: #9f1239;
-}
-
-.stock-hero-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.stock-hero-value {
-  font-size: 2.25rem;
-  font-weight: 900;
-  line-height: 1.1;
-  margin: 0.25rem 0;
-}
-
-.stock-unit {
-  font-size: 1.25rem;
-  font-weight: 600;
-  opacity: 0.8;
-}
-
-.stock-hero-status {
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* Pricing Grid */
-.pricing-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-}
-
-.price-card {
-  border-radius: 1rem;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 2px solid transparent;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.price-card:hover {
-  transform: translateY(-2px);
-}
-
-.price-card.retail {
-  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-  color: #ffffff;
-  box-shadow: 0 8px 16px -2px rgba(29, 78, 216, 0.25);
-  border-color: #2563eb;
-}
-
-.price-card.retail .price-tag {
-  color: #93c5fd;
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-}
-
-.price-card.retail .price-amount {
-  color: #ffffff;
-  font-size: 2.25rem;
-  font-weight: 900;
-  line-height: 1.15;
-  margin: 0.5rem 0;
-}
-
-.price-card.retail .price-sub {
-  color: #bfdbfe;
-  font-size: 0.875rem;
-}
-
-.price-card.wholesale {
-  background-color: #ffffff;
-  border: 1.5px solid var(--border-color);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.price-card.wholesale .price-tag {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.min-qty-badge {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
-}
-
-.price-card.wholesale .price-amount {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0.5rem 0;
-  line-height: 1.2;
-}
-
-.price-card.wholesale.tier-3 .price-amount {
-  color: #059669;
-}
-
-.price-card.wholesale .price-sub {
-  font-size: 0.825rem;
-  color: var(--muted-text);
-  font-weight: 500;
-}
-
-/* ==========================================================================
-   Multiple Results Table View
+   Table Results View (Spacious & Clean)
    ========================================================================== */
 .table-wrapper {
   background-color: var(--surface);
@@ -521,20 +288,16 @@ body {
 }
 
 .table-info-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1e293b;
-}
-
-.table-info-subtitle {
-  font-size: 0.875rem;
-  color: var(--muted-text);
 }
 
 .table-container {
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .data-table {
@@ -545,9 +308,9 @@ body {
 
 .data-table th {
   background-color: var(--table-header-bg);
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.25rem;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #1e293b;
@@ -555,16 +318,15 @@ body {
 }
 
 .data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 1rem;
+  padding: 1.1rem 1.25rem;
+  font-size: 1.05rem;
   color: #0f172a;
   border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
 }
 
 .table-row {
-  cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .table-row:nth-child(even) {
@@ -575,47 +337,64 @@ body {
   background-color: #f1f5f9;
 }
 
-.table-row.row-selected {
-  background-color: #eff6ff !important;
-  box-shadow: inset 4px 0 0 #2563eb;
-}
-
 .barcode-cell {
   font-family: var(--font-geist-mono), monospace;
   font-weight: 600;
-  font-size: 0.95rem;
-  color: #3b82f6;
+  font-size: 1rem;
+  color: #2563eb;
 }
 
 .product-name-cell {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   color: #0f172a;
+}
+
+.product-name-text {
+  line-height: 1.35;
+}
+
+.product-category-sub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 0.2rem;
+}
+
+.tier-min-qty {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0284c7;
+  background-color: #e0f2fe;
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-top: 0.15rem;
 }
 
 .uom-pill {
   display: inline-block;
   background-color: #f1f5f9;
   border: 1px solid #cbd5e1;
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 0.375rem;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #475569;
 }
 
 .price-cell {
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   color: #1d4ed8;
 }
 
 .stock-pill {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .stock-ok {
@@ -631,7 +410,7 @@ body {
 }
 
 .grosir-cell {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: #334155;
 }
 
@@ -828,19 +607,6 @@ body {
 
 /* Responsive Breakpoints */
 @media (max-width: 1024px) {
-  .pricing-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .spotlight-header {
-    flex-direction: column;
-  }
-
-  .stock-hero-badge {
-    width: 100%;
-    text-align: left;
-  }
-
   .feature-cards {
     grid-template-columns: 1fr;
   }
@@ -853,10 +619,6 @@ body {
 
   .header {
     padding: 1rem;
-  }
-
-  .pricing-container {
-    grid-template-columns: 1fr;
   }
 
   .brand-title {
